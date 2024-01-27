@@ -1,3 +1,48 @@
 #! /usr/bin/env zsh
 
+#
+# ::: Utility :::
+#
+
+function any; [[ ${${@:2}[(i)$1]} -le ${#@:2} ]]
+
+function map; foreach e (${@:2}) { ${@:1:1} $e }
+
+#
+# ::: Lib :::
+#
+
+function load_layout {
+  local layout=$1
+
+  . ./layouts/${layout}.mux
+}
+
+function print_layouts {
+  local -a layouts=($@)
+
+  f() { printf "%s\n" $1 }
+
+  map f $layouts
+}
+
+#
+# ::: Main :::
+#
+
+function main {
+  local    layout=$1
+  local -a layouts=($(ls -1 ./layouts/*.mux))
+
+  f() { print ${1:r:t} }
+
+  local -a basenames=($(map f $layouts))
+
+  { any $layout $basenames } \
+    && load_layout $layout \
+    || print_layouts $basenames
+}
+
+main $@
+
 # vim: set textwidth=80 colorcolumn=80:
