@@ -15,7 +15,7 @@ function map; foreach e (${@:2}) { ${@:1:1} $e }
 function load_layout {
   local layout=$1
 
-  . ./layouts/${layout}.mux
+  . $MUX_LAYOUTS/${layout}.mux
 }
 
 function print_layouts {
@@ -32,7 +32,7 @@ function print_layouts {
 
 function main {
   local    layout=$1
-  local -a layouts=($(ls -1 ./layouts/*.mux))
+  local -a layouts=($MUX_LAYOUTS/*.mux)
 
   f() { print ${1:r:t} }
 
