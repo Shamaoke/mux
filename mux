@@ -13,9 +13,10 @@ function each; foreach e (${@:2}) { ${@:1:1} $e }
 #
 
 function load_layout {
-  local layout=$1
+  local mux_layout=$1
+  local mux_session_name=$2
 
-  . $MUX_LAYOUTS/${layout}.mux
+  . $MUX_LAYOUTS/${mux_layout}.mux $mux_session_name
 }
 
 function print_layouts {
@@ -26,21 +27,41 @@ function print_layouts {
   each f $layouts
 }
 
+function start_session {
+  local mux_layout=$1
+  local mux_session_name=$2
+  local mux_layouts=($MUX_LAYOUTS/*.mux)
+
+  f() { print ${1:r:t} }
+
+  local -a basenames=($(each f $mux_layouts))
+
+  { any $mux_layout $basenames } \
+    && load_layout $mux_layout $mux_session_name \
+    || print_layouts $basenames
+}
+
+function print_mux_commands {
+  local commands=('start')
+
+  f() { printf "%s\n" $1 }
+
+  each f $commands
+}
+
 #
 # ::: Main :::
 #
 
 function main {
-  local    layout=$1
-  local -a layouts=($MUX_LAYOUTS/*.mux)
+  local mux_command=$1
+  local mux_layout=$2
+  local mux_cwd=${$(pwd):t}
+  local mux_session_name=${3:-${mux_cwd}}
 
-  f() { print ${1:r:t} }
-
-  local -a basenames=($(each f $layouts))
-
-  { any $layout $basenames } \
-    && load_layout $layout \
-    || print_layouts $basenames
+  [[ $mux_command == 'start' ]] \
+    && start_session $mux_layout $mux_session_name \
+    || print_mux_commands
 }
 
 main $@
