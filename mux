@@ -57,7 +57,16 @@ function main {
   local mux_command=$1
   local mux_layout=$2
   local mux_cwd=${$(pwd):t}
-  local mux_session_name=${3:-${mux_cwd}}
+  local mux_session_name=${${3:-${mux_cwd}}//./_}
+  #
+  # The `mux_session_name` is either the third function argument (`$3`) or the
+  # base name of the current working directory (`${$(pwd):t}`) with all dots (`.`)
+  # removed from its name (`${mux_session_name//./_`).
+  #
+  # Details
+  # -------
+  # [14.3 Parameter Expansion](https://zsh.sourceforge.io/Doc/Release/Expansion.html#Parameter-Expansion)
+  #
 
   [[ $mux_command == 'start' ]] \
     && start_session $mux_layout $mux_session_name \
