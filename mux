@@ -30,7 +30,7 @@ function print_layouts {
 function start_session {
   local mux_layout=$1
   local mux_session_name=$2
-  local mux_layouts=($MUX_LAYOUTS/*.mux)
+  local -a mux_layouts=($MUX_LAYOUTS/*.mux)
 
   f() { print ${1:r:t} }
 
@@ -42,7 +42,7 @@ function start_session {
 }
 
 function print_mux_commands {
-  local commands=('start')
+  local -a commands=('start')
 
   f() { printf "%s\n" $1 }
 
