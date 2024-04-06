@@ -61,7 +61,7 @@ function main {
   #
   # The `mux_session_name` is either the third function argument `$3` or the
   # base name of the current working directory `${$(pwd):t}` with all dots
-  # in its name replaced with underscores `${mux_session_name//./_`.
+  # in its name replaced with underscores `${mux_session_name//./_}`.
   #
   # Details
   # -------
