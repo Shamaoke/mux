@@ -14,9 +14,10 @@ function each; foreach e (${@:2}) { ${@:1:1} $e }
 
 function load_layout {
   local mux_layout=$1
-  local mux_session_name=$2
+  local mux_state=$2
+  local mux_session_name=$3
 
-  . $MUX_LAYOUTS/${mux_layout}.mux $mux_session_name
+  . $MUX_LAYOUTS/${mux_layout}.mux $mux_session_name $mux_state
 }
 
 function print_layouts {
@@ -29,7 +30,8 @@ function print_layouts {
 
 function start_session {
   local mux_layout=$1
-  local mux_session_name=$2
+  local mux_state=$2
+  local mux_session_name=$3
   local -a mux_layouts=($MUX_LAYOUTS/*.mux)
 
   f() { print ${1:r:t} }
@@ -37,7 +39,7 @@ function start_session {
   local -a basenames=($(each f $mux_layouts))
 
   { any $mux_layout $basenames } \
-    && load_layout $mux_layout $mux_session_name \
+    && load_layout $mux_layout $mux_state $mux_session_name \
     || print_layouts $basenames
 }
 
@@ -54,22 +56,19 @@ function print_mux_commands {
 #
 
 function main {
-  local mux_command=$1
-  local mux_layout=$2
+  local -a args=($@)
+
+  local mux_command=${args[1]}
+  local mux_layout=${args[-1]}
   local mux_cwd=${$(pwd):t}
-  local mux_session_name=${${3:-${mux_cwd}}//./_}
-  #
-  # The `mux_session_name` is either the third function argument `$3` or the
-  # base name of the current working directory `${$(pwd):t}` with all dots
-  # in its name replaced with underscores `${mux_session_name//./_}`.
-  #
-  # Details
-  # -------
-  # [14.3 Parameter Expansion](https://zsh.sourceforge.io/Doc/Release/Expansion.html#Parameter-Expansion)
-  #
+
+  local -a mux_options=(${args:1:-1})
+
+  local mux_state=${${mux_options[(r)-d|--detached]:+detached}:-attached}
+  local mux_session_name=${mux_options[mux_options[(i)-n|--name] + 1]:-${${mux_options[(r)--name=*]#--name=}:-${${mux_cwd}//./_}}}
 
   [[ $mux_command == 'start' ]] \
-    && start_session $mux_layout $mux_session_name \
+    && start_session $mux_layout $mux_state $mux_session_name \
     || print_mux_commands
 }
 
