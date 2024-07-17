@@ -1,5 +1,7 @@
 #! /usr/bin/env zsh
 
+declare -a args=($@)
+
 #
 # ::: Utility :::
 #
@@ -13,6 +15,7 @@ function each; foreach e (${@:2}) { ${@:1:1} $e }
 #
 
 function load_layout {
+
   local mux_layout=$1
   local mux_state=$2
   local mux_session_name=$3
@@ -21,6 +24,7 @@ function load_layout {
 }
 
 function print_layouts {
+
   local -a layouts=($@)
 
   f() { printf "%s\n" $1 }
@@ -29,6 +33,7 @@ function print_layouts {
 }
 
 function start_session {
+
   local mux_layout=$1
   local mux_state=$2
   local mux_session_name=$3
@@ -44,6 +49,7 @@ function start_session {
 }
 
 function print_mux_commands {
+
   local -a commands=('start')
 
   f() { printf "%s\n" $1 }
@@ -55,8 +61,7 @@ function print_mux_commands {
 # ::: Main :::
 #
 
-function main {
-  local -a args=($@)
+function main TRAPEXIT {
 
   local mux_command=${args[1]}
   local mux_layout=${args[-1]}
@@ -71,7 +76,5 @@ function main {
     && start_session $mux_layout $mux_state $mux_session_name \
     || print_mux_commands
 }
-
-main $@
 
 # vim: set textwidth=80 colorcolumn=80:
